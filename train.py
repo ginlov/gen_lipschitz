@@ -108,10 +108,10 @@ def train(model, log_file_name=""):
 
 
 def train_epoch(model, train_loader, optimizer, loss_fn, device, log_file, epoch):
-    batch_time = AverageMeter("Time", "6.3f")
-    data_time = AverageMeter("Data", "6.3f")
+    batch_time = AverageMeter("Time", ":6.3f")
+    data_time = AverageMeter("Data", ":6.3f")
     losses = AverageMeter('Loss', ':.4e')
-    weight_norm = AverageMeter('Weight Norm', '6.3f')
+    weight_norm = AverageMeter('Weight Norm', ':6.3f')
     top1 = AverageMeter('Acc@1', ':6.2f')
     top5 = AverageMeter('Acc@5', ':6.2f')
     progress = ProgressMeter(
