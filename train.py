@@ -323,3 +323,6 @@ def cal_weight_norm(model, norm=2):
     cum_prod = 1.0
     process_layer(model, norm, cum_prod)
     return cum_prod
+
+if __name__ == "__main__":
+    main()
