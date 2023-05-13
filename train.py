@@ -2,6 +2,7 @@ from model._resnet import _resnet, BasicBlock
 from torchvision import datasets, transforms
 from enum import Enum
 from torch import nn
+from loguru import logger
 
 import torch
 import time
@@ -25,6 +26,7 @@ def train(model, log_file_name=""):
     ###############################
     ### LOADING DATASET ###########
     ###############################
+    logger.info("Loading data")
     traindir = "/kaggle/input/imagenet-object-localization-challenge/ILSVRC/Data/CLS-LOC/train"
     valdir = "/kaggle/working/imagenet-object-localization-challenge/val"
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -61,6 +63,7 @@ def train(model, log_file_name=""):
     ## LOADING COMPULSORY COMPONENTS ##
     ###################################
     # model = _resnet(BasicBlock, [2, 2, 2, 2])
+    logger.info("Preparing model")
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model.to(device)
     loss_fn = nn.CrossEntropyLoss().to(device)
@@ -68,6 +71,7 @@ def train(model, log_file_name=""):
                                 momentum=momentum,
                                 weight_decay=weight_decay)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
+    logger.info("Start training")
     for i in range(num_epoch):
         train_epoch(model, train_loader, optimizer, loss_fn, device, log_file_name, i)
 
