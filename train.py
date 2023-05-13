@@ -27,28 +27,42 @@ def train(model, log_file_name=""):
     ### LOADING DATASET ###########
     ###############################
     logger.info("Loading data")
-    traindir = "/kaggle/input/imagenet-object-localization-challenge/ILSVRC/Data/CLS-LOC/train"
-    valdir = "/kaggle/working/imagenet-object-localization-challenge/val"
+    # traindir = "/kaggle/input/imagenet-object-localization-challenge/ILSVRC/Data/CLS-LOC/train"
+    # valdir = "/kaggle/working/imagenet-object-localization-challenge/val"
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 
-    train_dataset = datasets.ImageFolder(
-        traindir,
-        transforms.Compose([
-            transforms.RandomResizedCrop(224),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            normalize,
-        ]))
+    # train_dataset = datasets.ImageFolder(
+    #     traindir,
+    #     transforms.Compose([
+    #         transforms.RandomResizedCrop(224),
+    #         transforms.RandomHorizontalFlip(),
+    #         transforms.ToTensor(),
+    #         normalize,
+    #     ]))
+    train_dataset = datasets.CIFAR10(root="cifar_train", train=True, 
+                                     transform=transforms.Compose([
+                                     transforms.RandomHorizontalFlip(),
+                                     transforms.ToTensor(),
+                                     normalize,
+                                     ]),
+                                     download=True)
+    val_dataset = datasets.CIFAR10(root="cifar_val", train=False, 
+                                   transform=transforms.Compose([
+                                   # transforms.RandomHorizontalFlip(),
+                                   transforms.ToTensor(),
+                                   normalize,
+                                   ]),
+                                   download=True)
 
-    val_dataset = datasets.ImageFolder(
-        valdir,
-        transforms.Compose([
-            transforms.Resize(256),
-            transforms.CenterCrop(224),
-            transforms.ToTensor(),
-            normalize,
-        ]))
+    # val_dataset = datasets.ImageFolder(
+    #     valdir,
+    #     transforms.Compose([
+    #         transforms.Resize(256),
+    #         transforms.CenterCrop(224),
+    #         transforms.ToTensor(),
+    #         normalize,
+    #     ]))
 
 
     train_loader = torch.utils.data.DataLoader(
