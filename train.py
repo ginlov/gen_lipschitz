@@ -336,7 +336,7 @@ def cal_weight_norm(model, norm=2):
         if len(children) > 0:
             for each in children:
                 process_layer(each, norm, cum_prod)
-        else:
+        elif hasattr(layer, "weight"):
             cum_prod *= np.log10(np.linalg.norm(layer.weight.detach().cpu().numpy().reshape(-1), ord=norm))
     cum_prod = 1.0
     process_layer(model, norm, cum_prod)
