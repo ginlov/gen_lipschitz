@@ -151,6 +151,7 @@ def train_epoch(model, train_loader, optimizer, loss_fn, device, log_file, epoch
         end = time.time()
 
         if i % 100 == 0:
+            print(model.conv1.running_mean)
             progress.display(i + 1)
 
 
