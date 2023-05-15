@@ -37,10 +37,12 @@ class ModifiedConv2d(nn.Conv2d):
                  device=None,
                  dtype=None
                  ):
-        self.running_var = None
-        self.running_mean = None
-        self.save_var = False
+        factory_kwargs = {"device": device, "dtype": dtype}
         self.momentum = 0.1
+        self.register_buffer('running_mean', torch.zeros(out_channels, **factory_kwargs))
+        self.register_buffer('running_var', torch.ones(out_channels, **factory_kwargs))
+        self.running_mean: Optional[Tensor]
+        self.running_var: Optional[Tensor]
         super().__init__(in_channels,
                          out_channels,
                          kernel_size,
@@ -55,10 +57,9 @@ class ModifiedConv2d(nn.Conv2d):
     def forward(self, input: Tensor):
         cur_var = torch.var(input, dim=0)
         cur_mean = torch.mean(input, dim=0)
-        if self.save_var is False:
-            self.running_var = torch.nn.Parameter(cur_var)
-            self.running_mean = torch.nn.Parameter(cur_mean)
-            self.save_var = True
+        if self.running_var is None:
+            self.running_var = cur_var
+            self.running_mean = cur_mean
         else:
             self.running_var = self.running_var * (1-self.momentum) + cur_var * self.momentum
             self.running_mean = self.running_mean * (1-self.momentum) + cur_mean * self.momentum
