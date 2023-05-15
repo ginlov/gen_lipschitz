@@ -223,7 +223,7 @@ def main():
         ####################
         ## Two Batch Norm ##
         ####################
-        model = _resnet(BasicBlock, [2, 2, 2, 2], norm_layer=None)
+        model = _resnet(BasicBlock, [2, 2, 2, 2], norm_layer=None, signal=1)
         log_file_name = "two_batch_norm.log"
         train(model, log_file_name)
     elif args.model_type == 2:

@@ -221,6 +221,7 @@ class ResNet(nn.Module):
         width_per_group: int = 64,
         replace_stride_with_dilation: Optional[List[bool]] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None,
+        signal = -1
     ) -> None:
         super().__init__()
         # _log_api_usage_once(self)
@@ -248,9 +249,14 @@ class ResNet(nn.Module):
             self.bn1 = norm_layer(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.layer1 = self._make_layer(block, 64, layers[0])
+
+        if self._norm_layer is None and signal == 1:
+            must_norm = True
+        else:
+            must_norm = False
+        self.layer1 = self._make_layer(block, 64, layers[0], must_norm=must_norm)
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2, dilate=replace_stride_with_dilation[0])
-        self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1])
+        self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1], must_norm=must_norm)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2])
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = ModifiedLinear(512 * block.expansion, num_classes)
@@ -279,8 +285,11 @@ class ResNet(nn.Module):
         blocks: int,
         stride: int = 1,
         dilate: bool = False,
+        must_norm: bool = False,
     ) -> nn.Sequential:
         norm_layer = self._norm_layer
+        if norm_layer is None and must_norm:
+            norm_layer = nn.BatchNorm2d 
         downsample = None
         previous_dilation = self.dilation
         if dilate:
