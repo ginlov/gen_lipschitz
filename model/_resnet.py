@@ -56,8 +56,8 @@ class ModifiedConv2d(nn.Conv2d):
         cur_var = torch.var(input, dim=0)
         cur_mean = torch.mean(input, dim=0)
         if self.save_var is False:
-            self.running_var = torch.nn.Parameter(cur_var.detach().cpu().numpy())
-            self.running_mean = torch.nn.Parameter(cur_mean.detach().cpu().numpy())
+            self.running_var = torch.nn.Parameter(cur_var)
+            self.running_mean = torch.nn.Parameter(cur_mean)
             self.save_var = True
         else:
             self.running_var = self.running_var * (1-self.momentum) + cur_var * self.momentum
