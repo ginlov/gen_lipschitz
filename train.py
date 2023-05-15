@@ -161,7 +161,7 @@ def validate_epoch(model, valid_loader, loss_fn, device, log_file, epoch):
             for i, (image, target) in enumerate(valid_loader):
                 i = base_progress + i
                 image = image.to(device, non_blocking=True)
-                target = image.to(device, non_blocking=True)
+                target = target.to(device, non_blocking=True)
                 output = model(image)
                 loss = loss_fn(output, target)
 
