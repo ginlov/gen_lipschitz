@@ -5,7 +5,7 @@ from typing import Optional, Callable, Type, Union, List, Any
 
 def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
     """3x3 convolution with padding"""
-    return nn.Conv2d(
+    return nn.ModifiedConv2d(
         in_planes,
         out_planes,
         kernel_size=3,
@@ -19,7 +19,79 @@ def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, d
 
 def conv1x1(in_planes: int, out_planes: int, stride: int = 1) -> nn.Conv2d:
     """1x1 convolution"""
-    return nn.Conv2d(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
+    return nn.ModifiedConv2d(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
+
+
+
+class ModifiedConv2d(nn.Conv2d):
+    def __init__(self,
+                 in_channels: int,
+                 out_channels: int,
+                 kernel_size,
+                 stride,
+                 padding,
+                 dilation,
+                 groups,
+                 bias,
+                 padding_mode,
+                 device,
+                 dtype
+                 ):
+        self.running_var = None
+        self.running_mean = None
+        self.save_var = False
+        self.momentum = 0.1
+        super().__init__(in_channels,
+                         out_channels,
+                         kernel_size,
+                         stride,
+                         padding,
+                         dilation,
+                         groups,
+                         bias,
+                         padding_mode,
+                         device,
+                         dtype)
+    def forward(self, input: Tensor):
+        cur_var = torch.var(input, dim=0)
+        cur_mean = torch.mean(input, dim=0)
+        if self.save_var is False:
+            self.running_var = cur_var
+            self.running_mean = cur_mean
+            self.save_var = True
+        else:
+            self.running_var = self.running_var * (1-self.momentum) + cur_var * self.momentum
+            self.running_mean = self.running_mean * (1-self.momentum) + cur_mean * self.momentum
+        return super().forward(input)
+    
+class ModifiedLinear(nn.Linear):
+    __constants__ = ['in_features', 'out_features']
+    in_features: int
+    out_features: int
+    weight: Tensor
+    def __init__(self,
+                 in_features,
+                 out_features,
+                 bias,
+                 device,
+                 dtype):
+        self.running_var = None
+        self.running_mean = None
+        self.save_var = False
+        self.momentum = 0.1
+        super().__init__(in_features, out_features, bias, device, dtype)
+
+    def forward(self, input: Tensor):
+        cur_var = torch.var(input, dim=0)
+        cur_mean = torch.mean(input, dim=0)
+        if self.save_var is False:
+            self.running_var = cur_var
+            self.running_mean = cur_mean
+            self.save_var = True
+        else:
+            self.running_mean = (1-self.momentum) * self.running_mean + self.momentum * cur_mean
+            self.running_var = (1-self.momentum) * self.running_var + self.momentum * cur_var
+        return super().forward(input)
 
 
 class BasicBlock(nn.Module):
@@ -168,7 +240,7 @@ class ResNet(nn.Module):
             )
         self.groups = groups
         self.base_width = width_per_group
-        self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=3, bias=False)
+        self.conv1 = nn.ModifiedConv2d(3, self.inplanes, kernel_size=7, stride=2, padding=3, bias=False)
         if norm_layer is None:
             self.bn1 = None
         else:
@@ -180,10 +252,10 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1])
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2])
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
+        self.fc = nn.ModifiedLinear(512 * block.expansion, num_classes)
 
         for m in self.modules():
-            if isinstance(m, nn.Conv2d):
+            if isinstance(m, nn.ModifiedConv2d):
                 nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
             elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
                 nn.init.constant_(m.weight, 1)
