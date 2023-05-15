@@ -191,7 +191,7 @@ def validate_epoch(model, valid_loader, loss_fn, device, log_file, epoch):
     run_validate(valid_loader)
     progress.display_summary()
 
-    return top1.avg
+    return top1.avg, top5.avg
 
 
 def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
