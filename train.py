@@ -151,7 +151,6 @@ def train_epoch(model, train_loader, optimizer, loss_fn, device, log_file, epoch
         end = time.time()
 
         if i % 100 == 0:
-            print(model.conv1.running_mean)
             progress.display(i + 1)
 
         if (i+1) % 30 == 0 and epoch < 4:
@@ -354,15 +353,15 @@ def log_var_mean(model, epoch, batch):
     mean = []
     def process_layer(layer):
         if isinstance(layer, ModifiedConv2d) or isinstance(layer, ModifiedLinear):
-            variance.append(layer.running_var)
-            mean.append(layer.running_mean)
+            variance.append(layer.running_var.detach().cpu())
+            mean.append(layer.running_mean.detach().cpu())
         elif len(list(layer.children())) > 0:
             for each in layer.children():
                 process_layer(each)
 
     process_layer(model)
-    torch.save(variance, f"variance_{epoch}_{batch}.pth")
-    torch.save(mean, f"mean_{epoch}_{batch}.pth")
+    torch.save(variance, f"variance/variance_{epoch}_{batch}.pth")
+    torch.save(mean, f"mean/mean_{epoch}_{batch}.pth")
 
 if __name__ == "__main__":
     main()
