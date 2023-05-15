@@ -39,10 +39,6 @@ class ModifiedConv2d(nn.Conv2d):
                  ):
         factory_kwargs = {"device": device, "dtype": dtype}
         self.momentum = 0.1
-        self.register_buffer('running_mean', torch.zeros(out_channels, **factory_kwargs))
-        self.register_buffer('running_var', torch.ones(out_channels, **factory_kwargs))
-        self.running_mean: Optional[Tensor]
-        self.running_var: Optional[Tensor]
         super().__init__(in_channels,
                          out_channels,
                          kernel_size,
@@ -54,6 +50,11 @@ class ModifiedConv2d(nn.Conv2d):
                          padding_mode,
                          device,
                          dtype)
+        self.register_buffer('running_mean', torch.zeros(out_channels, **factory_kwargs))
+        self.register_buffer('running_var', torch.ones(out_channels, **factory_kwargs))
+        self.running_mean: Optional[Tensor]
+        self.running_var: Optional[Tensor]
+
     def forward(self, input: Tensor):
         cur_var = torch.var(input, dim=0)
         cur_mean = torch.mean(input, dim=0)
