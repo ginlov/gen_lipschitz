@@ -139,7 +139,7 @@ class ModifiedMaxPool2d(nn.MaxPool2d):
         self.running_var = None
         self.save_var = False
 
-        super().__init__(kernel_size, stride=stride, padding=padding, dilation=dilation, return_indices=return_indices, ceil_model=ceil_mode)
+        super().__init__(kernel_size, stride=stride, padding=padding, dilation=dilation, return_indices=return_indices, ceil_mode=ceil_mode)
 
     def forward(self, input):
         output = super().forward(input)
