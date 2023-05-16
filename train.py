@@ -11,7 +11,7 @@ import argparse
 import numpy as np
 
 
-def train(model, log_file_name=""):
+def train(model, log_file_name="", clamp_value=-1):
     ##############################
     ###### Settings ##############
     ##############################
@@ -88,7 +88,7 @@ def train(model, log_file_name=""):
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
     logger.info("Start training")
     for i in range(num_epoch):
-        train_epoch(model, train_loader, optimizer, loss_fn, device, log_file_name, i)
+        train_epoch(model, train_loader, optimizer, loss_fn, device, log_file_name, i, clamp_value=clamp_value)
 
         acc1, acc5 = validate_epoch(model, val_loader, loss_fn, device, log_file_name, i)
 
@@ -108,7 +108,7 @@ def train(model, log_file_name=""):
         )
 
 
-def train_epoch(model, train_loader, optimizer, loss_fn, device, log_file, epoch):
+def train_epoch(model, train_loader, optimizer, loss_fn, device, log_file, epoch, clamp_value=-1):
     batch_time = AverageMeter("Time", ":6.3f")
     data_time = AverageMeter("Data", ":6.3f")
     losses = AverageMeter('Loss', ':.4e')
@@ -146,6 +146,8 @@ def train_epoch(model, train_loader, optimizer, loss_fn, device, log_file, epoch
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        if clamp_value != -1:
+            clamp_batch_norm(model, clamp_value)
 
         batch_time.update(time.time() - end)
         end = time.time()
@@ -210,6 +212,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--model_type", type=int, default=0)
+    parser.add_argument("--clamp_value", type=float, default=-1)
     args = parser.parse_args()
 
     if args.model_type == 0:
@@ -232,7 +235,10 @@ def main():
         #####################
         model = _resnet(BasicBlock, [2, 2, 2, 2], norm_layer=nn.BatchNorm2d)
         log_file_name = "batch_norm.log"
-        train(model, log_file_name)
+        if args.clamp_value != -1:
+            train(model, log_file_name, clamp_value=clamp_value)
+        else:
+            train(model, log_file_name)
     else:
         raise NotImplementedError()
 
@@ -363,6 +369,17 @@ def log_var_mean(model, epoch, batch):
     process_layer(model)
     torch.save(variance, f"variance/variance_{epoch}_{batch}.pth")
     torch.save(mean, f"mean/mean_{epoch}_{batch}.pth")
+
+
+def clamp_batch_norm(model, clamp_value):
+    def process_layer(layer, clamp_value_):
+        if isinstance(layer, torch.nn.BatchNorm2d):
+            layer.weight.clamp_(min=-clamp_value_, max=clamp_value_)
+        elif len(list(layer.children())) > 0:
+            for child in layer.children():
+                process_layer(child, clamp_value_)
+
+    process_layer(model, clamp_value)
 
 if __name__ == "__main__":
     main()
