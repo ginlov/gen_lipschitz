@@ -147,7 +147,8 @@ def train_epoch(model, train_loader, optimizer, loss_fn, device, log_file, epoch
         loss.backward()
         optimizer.step()
         if clamp_value != -1:
-            clamp_batch_norm(model, clamp_value)
+            with torch.no_grad():
+                clamp_batch_norm(model, clamp_value)
 
         batch_time.update(time.time() - end)
         end = time.time()
