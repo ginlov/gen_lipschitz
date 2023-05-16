@@ -337,16 +337,16 @@ def accuracy(output, target, topk=(1,)):
         return res
 
 def cal_weight_norm(model, norm=2):
-    cum_prod = 1.0
     def process_layer(layer, norm):
-        global cum_prod
+        cum_prod = 1.0
         children = list(layer.children())
         if len(children) > 0:
             for each in children:
-                process_layer(each, norm)
+                cum_prod *= process_layer(each, norm)
         elif hasattr(layer, "weight"):
             cum_prod *= np.log10(np.linalg.norm(layer.weight.detach().cpu().numpy().reshape(-1), ord=norm))
-    process_layer(model, norm)
+        return cum_prod
+    cum_prod = process_layer(model, norm)
     return cum_prod
 
 def log_var_mean(model, epoch, batch):
