@@ -1,4 +1,4 @@
-from model._resnet import _resnet, BasicBlock, ModifiedLinear, ModifiedConv2d
+from model._resnet import _resnet, BasicBlock, ModifiedLinear, ModifiedConv2d, ModifiedMaxPool2d, ModifiedAdaptiveAvgPool2d
 from torchvision import datasets, transforms
 from enum import Enum
 from torch import nn
@@ -352,7 +352,7 @@ def log_var_mean(model, epoch, batch):
     variance = []
     mean = []
     def process_layer(layer):
-        if isinstance(layer, ModifiedConv2d) or isinstance(layer, ModifiedLinear):
+        if isinstance(layer, ModifiedConv2d) or isinstance(layer, ModifiedLinear) or isinstance(layer, ModifiedAdaptiveAvgPool2d) or isinstance(layer, ModifiedMaxPool2d):
             variance.append(layer.running_var.detach().cpu())
             mean.append(layer.running_mean.detach().cpu())
         elif len(list(layer.children())) > 0:

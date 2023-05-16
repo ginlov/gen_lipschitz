@@ -55,15 +55,20 @@ class ModifiedConv2d(nn.Conv2d):
                          dtype)
 
     def forward(self, input: Tensor):
-        cur_var = torch.var(input, dim=0)
-        cur_mean = torch.mean(input, dim=0)
+        output = super().forward(input)
+        shape = len(list(output.shape))
+        dim = [i for i in range(shape) if i != 1]
+        cur_var = torch.var(output, dim=dim)
+        cur_mean = torch.mean(output, dim=dim)
         if self.save_var is False:
             self.running_var = cur_var
             self.running_mean = cur_mean
+            self.save_var = True
         else:
-            self.running_var = self.running_var * (1-self.momentum) + cur_var * self.momentum
-            self.running_mean = self.running_mean * (1-self.momentum) + cur_mean * self.momentum
-        return super().forward(input)
+            self.running_mean = (1-self.momentum) * self.running_mean + self.momentum * cur_mean
+            self.running_var = (1-self.momentum) * self.running_var + self.momentum * cur_var
+        return output
+
     
 class ModifiedLinear(nn.Linear):
     __constants__ = ['in_features', 'out_features']
@@ -83,8 +88,11 @@ class ModifiedLinear(nn.Linear):
         super().__init__(in_features, out_features, bias, device, dtype)
 
     def forward(self, input: Tensor):
-        cur_var = torch.var(input, dim=0)
-        cur_mean = torch.mean(input, dim=0)
+        output = super().forward(input)
+        shape = len(list(output.shape))
+        dim = [i for i in range(shape) if i != 1]
+        cur_var = torch.var(output, dim=dim)
+        cur_mean = torch.mean(output, dim=dim)
         if self.save_var is False:
             self.running_var = cur_var
             self.running_mean = cur_mean
@@ -92,8 +100,61 @@ class ModifiedLinear(nn.Linear):
         else:
             self.running_mean = (1-self.momentum) * self.running_mean + self.momentum * cur_mean
             self.running_var = (1-self.momentum) * self.running_var + self.momentum * cur_var
-        return super().forward(input)
+        return output
 
+class ModifiedAdaptiveAvgPool2d(nn.AdaptiveAvgPool2d):
+    def __init__(self, output_size):
+        self.momentum = 0.1
+        self.running_mean = None
+        self.running_var = None
+        self.save_var = False
+
+        super().__init__(output_size=output_size)
+
+    def forward(self, input):
+        output = super().forward(input)
+        shape = len(list(output.shape))
+        dim = [i for i in range(shape) if i != 1]
+        cur_var = torch.var(output, dim=dim)
+        cur_mean = torch.mean(output, dim=dim)
+        if self.save_var is False:
+            self.running_var = cur_var
+            self.running_mean = cur_mean
+            self.save_var = True
+        else:
+            self.running_mean = (1-self.momentum) * self.running_mean + self.momentum * cur_mean
+            self.running_var = (1-self.momentum) * self.running_var + self.momentum * cur_var
+        return output
+
+class ModifiedMaxPool2d(nn.MaxPool2d):
+    def __init__(self,
+                 kernel_size,
+                 stride=None,
+                 padding=0,
+                 dilation=1,
+                 return_indices=False,
+                 ceil_mode=False):
+        self.momentum = 0.1
+        self.running_mean = None
+        self.running_var = None
+        self.save_var = False
+
+        super().__init__(kernel_size, stride=stride, padding=padding, dilation=dilation, return_indices=return_indices, ceil_model=ceil_mode)
+
+    def forward(self, input):
+        output = super().forward(input)
+        shape = len(list(output.shape))
+        dim = [i for i in range(shape) if i != 1]
+        cur_var = torch.var(output, dim=dim)
+        cur_mean = torch.mean(output, dim=dim)
+        if self.save_var is False:
+            self.running_var = cur_var
+            self.running_mean = cur_mean
+            self.save_var = True
+        else:
+            self.running_mean = (1-self.momentum) * self.running_mean + self.momentum * cur_mean
+            self.running_var = (1-self.momentum) * self.running_var + self.momentum * cur_var
+        return output
 
 class BasicBlock(nn.Module):
     expansion: int = 1
@@ -248,7 +309,7 @@ class ResNet(nn.Module):
         else:
             self.bn1 = norm_layer(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.maxpool = ModifiedMaxPool2d(kernel_size=3, stride=2, padding=1)
 
         if self._norm_layer is None and signal == 1:
             must_norm = True
@@ -258,7 +319,7 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2, dilate=replace_stride_with_dilation[0])
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1], must_norm=must_norm)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2])
-        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.avgpool = ModifiedAdaptiveAvgPool2d((1, 1))
         self.fc = ModifiedLinear(512 * block.expansion, num_classes)
 
         for m in self.modules():
