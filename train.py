@@ -236,7 +236,7 @@ def main():
         model = _resnet(BasicBlock, [2, 2, 2, 2], norm_layer=nn.BatchNorm2d)
         log_file_name = "batch_norm.log"
         if args.clamp_value != -1:
-            train(model, log_file_name, clamp_value=clamp_value)
+            train(model, log_file_name, clamp_value=args.clamp_value)
         else:
             train(model, log_file_name)
     else:
