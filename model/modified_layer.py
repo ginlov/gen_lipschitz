@@ -36,8 +36,8 @@ class ModifiedConv2d(nn.Conv2d):
         output = super().forward(input)
         shape = len(list(output.shape))
         dim = [i for i in range(shape) if i != 1]
-        cur_var = torch.var(output, dim=dim)
-        cur_mean = torch.mean(output, dim=dim)
+        cur_var = torch.var(output, dim=dim).detach().cpu()
+        cur_mean = torch.mean(output, dim=dim).detach().cpu()
         if self.save_var is False:
             self.running_var = cur_var
             self.running_mean = cur_mean
@@ -69,8 +69,8 @@ class ModifiedLinear(nn.Linear):
         output = super().forward(input)
         shape = len(list(output.shape))
         dim = [i for i in range(shape) if i != 1]
-        cur_var = torch.var(output, dim=dim)
-        cur_mean = torch.mean(output, dim=dim)
+        cur_var = torch.var(output, dim=dim).detach().cpu()
+        cur_mean = torch.mean(output, dim=dim).detach().cpu()
         if self.save_var is False:
             self.running_var = cur_var
             self.running_mean = cur_mean
@@ -93,8 +93,8 @@ class ModifiedAdaptiveAvgPool2d(nn.AdaptiveAvgPool2d):
         output = super().forward(input)
         shape = len(list(output.shape))
         dim = [i for i in range(shape) if i != 1]
-        cur_var = torch.var(output, dim=dim)
-        cur_mean = torch.mean(output, dim=dim)
+        cur_var = torch.var(output, dim=dim).detach().cpu()
+        cur_mean = torch.mean(output, dim=dim).detach().cpu()
         if self.save_var is False:
             self.running_var = cur_var
             self.running_mean = cur_mean
@@ -123,8 +123,8 @@ class ModifiedMaxPool2d(nn.MaxPool2d):
         output = super().forward(input)
         shape = len(list(output.shape))
         dim = [i for i in range(shape) if i != 1]
-        cur_var = torch.var(output, dim=dim)
-        cur_mean = torch.mean(output, dim=dim)
+        cur_var = torch.var(output, dim=dim).detach().cpu()
+        cur_mean = torch.mean(output, dim=dim).detach().cpu()
         if self.save_var is False:
             self.running_var = cur_var
             self.running_mean = cur_mean
