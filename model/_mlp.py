@@ -1,16 +1,16 @@
 import torch
 
 from torch import nn
-from torch import Tensor
-from typing import Optional, Callable, Type, Union, List, Any, cast, Dict
-from model.modified_layer import ModifiedConv2d, ModifiedMaxPool2d, ModifiedLinear, ModifiedAdaptiveAvgPool2d
+from typing import Union, List, Any, cast
+from model.modified_layer import ModifiedLinear 
 
 class MLP(nn.Module):
     def __init__(self, 
                  in_features: int,
                  cfg: List[Union[str, int]], 
                  batch_norm: bool = False,
-                 num_classes: int = 1000):
+                 num_classes: int = 1000) -> None:
+        super().__init__()
         layers: List[nn.Module] = []
         _in_features = in_features
         for v in cfg:
