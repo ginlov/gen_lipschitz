@@ -15,22 +15,22 @@ def main():
         ###################
         ## No Batch Norm ##
         ###################
-        model = _resnet(BasicBlock, [2, 2, 2, 2], norm_layer=None)
-        log_file_name = "no_batch_norm.log"
+        model = _resnet(BasicBlock, [2, 2, 2, 2], norm_layer=None, num_classes=10)
+        log_file_name = "resnet_no_batch_norm.log"
         train(model, log_file_name)
     elif args.model_type == 1:
         ####################
         ## Two Batch Norm ##
         ####################
-        model = _resnet(BasicBlock, [2, 2, 2, 2], norm_layer=None, signal=1)
-        log_file_name = "two_batch_norm.log"
+        model = _resnet(BasicBlock, [2, 2, 2, 2], norm_layer=None, signal=1, num_classes=10)
+        log_file_name = "resnet_two_batch_norm.log"
         train(model, log_file_name)
     elif args.model_type == 2:
         #####################
         ## Full Batch Norm ##
         #####################
-        model = _resnet(BasicBlock, [2, 2, 2, 2], norm_layer=nn.BatchNorm2d)
-        log_file_name = "batch_norm.log"
+        model = _resnet(BasicBlock, [2, 2, 2, 2], norm_layer=nn.BatchNorm2d, num_classes=10)
+        log_file_name = "resnet_batch_norm.log"
         if args.clamp_value != -1:
             train(model, log_file_name, clamp_value=args.clamp_value)
         else:
