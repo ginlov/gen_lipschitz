@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, cast
 from model.modified_layer import ModifiedConv2d, ModifiedMaxPool2d, ModifiedLinear,ModifiedAdaptiveAvgPool2d
 
 cfgs: Dict[str, List[Union[str, int]]] = {
