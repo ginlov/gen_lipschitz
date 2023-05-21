@@ -121,7 +121,7 @@ def train_epoch(model, train_loader, optimizer, loss_fn, device, log_file, epoch
         loss = loss_fn(output, target)
 
         acc1, acc5 = accuracy(output, target, topk=(1, 5))
-        weight_norm_value = cal_weight_norm(model, norm=2)
+        weight_norm_value = cal_weight_norm(model, norm='max')
         losses.update(loss.item(), image.size(0))
         weight_norm.update(weight_norm_value, 1)
         top1.update(acc1[0], image.size(0))
@@ -289,15 +289,18 @@ def accuracy(output, target, topk=(1,)):
             res.append(correct_k.mul_(100.0 / batch_size))
         return res
 
-def cal_weight_norm(model, norm=2):
+def cal_weight_norm(model, norm='max'):
     def process_layer(layer, norm):
         cum_prod = 1.0
         children = list(layer.children())
         if len(children) > 0:
             for each in children:
-                cum_prod *= process_layer(each, norm)
+                cum_prod += process_layer(each, norm)
         elif hasattr(layer, "weight"):
-            cum_prod *= np.log10(np.linalg.norm(layer.weight.detach().cpu().numpy().reshape(-1), ord=norm))
+            if isinstance(norm, int):
+                cum_prod += np.log10(np.linalg.norm(layer.weight.detach().cpu().numpy().reshape(-1), ord=norm))
+            else:
+                cum_prod += np.log10(np.linalg.norm(layer.weight.detach().cpy().numpy().reshape(-1), ord=np.inf))
         return cum_prod
     cum_prod = process_layer(model, norm)
     return cum_prod
