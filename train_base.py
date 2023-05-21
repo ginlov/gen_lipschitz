@@ -300,7 +300,7 @@ def cal_weight_norm(model, norm='max'):
             if isinstance(norm, int):
                 cum_prod += np.log10(np.linalg.norm(layer.weight.detach().cpu().numpy().reshape(-1), ord=norm))
             else:
-                cum_prod += np.log10(np.linalg.norm(layer.weight.detach().cpy().numpy().reshape(-1), ord=np.inf))
+                cum_prod += np.log10(np.linalg.norm(layer.weight.detach().cpu().numpy().reshape(-1), ord=np.inf))
         return cum_prod
     cum_prod = process_layer(model, norm)
     return cum_prod
