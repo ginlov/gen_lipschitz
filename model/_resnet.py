@@ -1,7 +1,7 @@
 import torch
 from torch import nn, Tensor
 from typing import Optional, Callable, Type, Union, List, Any
-from .modified_layer import *
+from model.modified_layer import ModifiedConv2d, ModifiedAdaptiveAvgPool2d, ModifiedLinear, ModifiedMaxPool2d
 
 def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
     """3x3 convolution with padding"""
