@@ -15,14 +15,14 @@ def main():
         ###################
         ## No Batch Norm ##
         ###################
-        model = _vgg("A", batch_norm=False, init_weight=True, num_classes=10)
+        model = _vgg("A", batch_norm=False, init_weights=True, num_classes=10)
         log_file_name = "vgg_no_batch_norm.log"
         train(model, log_file_name)
     elif args.model_type == 2:
         #####################
         ## Full Batch Norm ##
         #####################
-        model = _vgg("A", batch_norm=True, init_weight=True, num_classes=10)
+        model = _vgg("A", batch_norm=True, init_weights=True, num_classes=10)
         log_file_name = "vgg_batch_norm.log"
         if args.clamp_value != -1:
             train(model, log_file_name, clamp_value=args.clamp_value)
