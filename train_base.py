@@ -18,7 +18,7 @@ def train(model, log_file_name="", clamp_value=-1):
     ##############################
     global best_acc1
     best_acc1 = 0.0
-    batch_size = 64
+    batch_size = 32
     workers = 5
     num_epoch = 90
     lr = 1e-3
