@@ -41,7 +41,7 @@ def analyze(log_file, batch_norm, model):
         if i % 5 == 0:
             for j in range(4):
                 list_of_mean[j][key] = variance[key]['mean'][visualize_layers[j]]
-                list_of_var[j][key] = variance[key]['var'][visualize_layers[j]]
+                list_of_var[j][key] = np.sqrt(variance[key]['var'][visualize_layers[j]])
 
     fig = plt.figure(figsize=(4, 3))
     ax = fig.add_subplot(1, 1, 1)
