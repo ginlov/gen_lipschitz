@@ -31,21 +31,17 @@ def train(model, log_file_name="", clamp_value=-1):
     logger.info("Loading data")
     # normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
     #                                  std=[0.229, 0.224, 0.225])
-    def transform(img: torch.Tensor):
-        return img / 127.5 - 1.0
 
     train_dataset = datasets.CIFAR10(root="cifar_train", train=True, 
                                      transform=transforms.Compose([
                                      transforms.RandomHorizontalFlip(),
                                      transforms.ToTensor(),
-                                     transform,
                                      ]),
                                      download=True)
     val_dataset = datasets.CIFAR10(root="cifar_val", train=False, 
                                    transform=transforms.Compose([
                                    # transforms.RandomHorizontalFlip(),
                                    transforms.ToTensor(),
-                                   transform,
                                    ]),
                                    download=True)
 
