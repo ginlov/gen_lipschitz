@@ -54,7 +54,10 @@ def analyze(log_file, batch_norm, model):
     plt.xticks(fontsize=10)
     plt.yticks(fontsize=10)
     fig.tight_layout()
-    plt.savefig(f"image/{batch_norm}.png", dpi=250)
+    if batch_norm == "BN":
+        plt.savefig(f"image/{model}_{batch_norm}.png", dpi=250)
+    else:
+        plt.savefig(f"image/{model}_without_batch_norm.pnt", dpi=250)
 
 
 def analyze_log(log):
