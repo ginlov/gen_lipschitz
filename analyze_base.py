@@ -49,7 +49,7 @@ def analyze(log_file, batch_norm, model):
     ax.set_ylabel(r'$\sigma^{2}$', fontdict={'fontsize': 18})
     for i in range(4):
         ax.plot(list(list_of_mean[i].keys()), list(list_of_mean[i].values()), label=f"{batch_norm}, Layer {visualize_layers[i] + 1}")
-        ax.fill_between(list(list_of_mean[i].keys()), np.array(list(list_of_mean[i].values())) - np.array(list(list_of_var[i].values())), np.array(list(list_of_mean[i].values())) + np.array(list(list_of_var[i].values())), alpha=0.3)
+        ax.fill_between(list(list_of_mean[i].keys()), np.clip(np.array(list(list_of_mean[i].values())) - np.array(list(list_of_var[i].values())), 0), np.array(list(list_of_mean[i].values())) + np.array(list(list_of_var[i].values())), alpha=0.3)
     ax.legend(fontsize=12, loc="upper left")
     plt.xticks(fontsize=10)
     plt.yticks(fontsize=10)
