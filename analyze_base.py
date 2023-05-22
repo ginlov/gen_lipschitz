@@ -57,7 +57,7 @@ def analyze(log_file, batch_norm, model):
     if batch_norm == "BN":
         plt.savefig(f"image/{model}_{batch_norm}.png", dpi=250)
     else:
-        plt.savefig(f"image/{model}_without_batch_norm.pnt", dpi=250)
+        plt.savefig(f"image/{model}_without_batch_norm.png", dpi=250)
 
 
 def analyze_log(log):
