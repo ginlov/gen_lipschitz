@@ -26,6 +26,7 @@ class MLP(nn.Module):
         self.features_extractor = nn.Sequential(*layers)
         self.classifier = nn.Sequential(
             ModifiedLinear(_in_features, 32),
+            nn.BatchNorm1d(32),
             nn.ReLU(inplace=True),
             ModifiedLinear(32, num_classes)
         )
