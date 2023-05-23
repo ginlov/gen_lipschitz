@@ -38,15 +38,16 @@ class ModifiedConv2d(nn.Conv2d):
         dim = [i for i in range(shape) if i != 1]
         cur_var = torch.var(output, dim=dim).detach().cpu()
         cur_mean = torch.mean(output, dim=dim).detach().cpu()
-        if self.save_var is False:
-            self.running_var = cur_var
-            self.running_mean = cur_mean
-            self.save_var = True
-        else:
-            self.running_mean = (1-self.momentum) * self.running_mean + self.momentum * cur_mean
-            self.running_var = (1-self.momentum) * self.running_var + self.momentum * cur_var
+        # if self.save_var is False:
+        #     self.running_var = cur_var
+        #     self.running_mean = cur_mean
+        #     self.save_var = True
+        # else:
+        #     self.running_mean = (1-self.momentum) * self.running_mean + self.momentum * cur_mean
+        #     self.running_var = (1-self.momentum) * self.running_var + self.momentum * cur_var
+        self.running_var = cur_var
+        self.running_mean = cur_mean
         return output
-
     
 class ModifiedLinear(nn.Linear):
     __constants__ = ['in_features', 'out_features']
@@ -71,13 +72,15 @@ class ModifiedLinear(nn.Linear):
         dim = [i for i in range(shape) if i != 1]
         cur_var = torch.var(output, dim=dim).detach().cpu()
         cur_mean = torch.mean(output, dim=dim).detach().cpu()
-        if self.save_var is False:
-            self.running_var = cur_var
-            self.running_mean = cur_mean
-            self.save_var = True
-        else:
-            self.running_mean = (1-self.momentum) * self.running_mean + self.momentum * cur_mean
-            self.running_var = (1-self.momentum) * self.running_var + self.momentum * cur_var
+        # if self.save_var is False:
+        #     self.running_var = cur_var
+        #     self.running_mean = cur_mean
+        #     self.save_var = True
+        # else:
+        #     self.running_mean = (1-self.momentum) * self.running_mean + self.momentum * cur_mean
+        #     self.running_var = (1-self.momentum) * self.running_var + self.momentum * cur_var
+        self.running_var = cur_var
+        self.running_mean = cur_mean
         return output
 
 class ModifiedAdaptiveAvgPool2d(nn.AdaptiveAvgPool2d):
@@ -95,13 +98,15 @@ class ModifiedAdaptiveAvgPool2d(nn.AdaptiveAvgPool2d):
         dim = [i for i in range(shape) if i != 1]
         cur_var = torch.var(output, dim=dim).detach().cpu()
         cur_mean = torch.mean(output, dim=dim).detach().cpu()
-        if self.save_var is False:
-            self.running_var = cur_var
-            self.running_mean = cur_mean
-            self.save_var = True
-        else:
-            self.running_mean = (1-self.momentum) * self.running_mean + self.momentum * cur_mean
-            self.running_var = (1-self.momentum) * self.running_var + self.momentum * cur_var
+        # if self.save_var is False:
+        #     self.running_var = cur_var
+        #     self.running_mean = cur_mean
+        #     self.save_var = True
+        # else:
+        #     self.running_mean = (1-self.momentum) * self.running_mean + self.momentum * cur_mean
+        #     self.running_var = (1-self.momentum) * self.running_var + self.momentum * cur_var
+        self.running_var = cur_var
+        self.running_mean = cur_mean
         return output
 
 class ModifiedMaxPool2d(nn.MaxPool2d):
@@ -125,12 +130,14 @@ class ModifiedMaxPool2d(nn.MaxPool2d):
         dim = [i for i in range(shape) if i != 1]
         cur_var = torch.var(output, dim=dim).detach().cpu()
         cur_mean = torch.mean(output, dim=dim).detach().cpu()
-        if self.save_var is False:
-            self.running_var = cur_var
-            self.running_mean = cur_mean
-            self.save_var = True
-        else:
-            self.running_mean = (1-self.momentum) * self.running_mean + self.momentum * cur_mean
-            self.running_var = (1-self.momentum) * self.running_var + self.momentum * cur_var
+        # if self.save_var is False:
+        #     self.running_var = cur_var
+        #     self.running_mean = cur_mean
+        #     self.save_var = True
+        # else:
+        #     self.running_mean = (1-self.momentum) * self.running_mean + self.momentum * cur_mean
+        #     self.running_var = (1-self.momentum) * self.running_var + self.momentum * cur_var
+        self.running_var = cur_var
+        self.running_mean = cur_mean
         return output
 
