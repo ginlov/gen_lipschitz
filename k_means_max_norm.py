@@ -68,6 +68,7 @@ class KMeans:
     def update_diameter(self):
         for i in range(self.n_clusters):
             cluster = self.clusters['diameter_list'][i]
+            print(f"diameter {cluster}")
             if cluster == []:
                 self.diameter[i] = 0.0
             else:
