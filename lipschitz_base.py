@@ -7,7 +7,7 @@ from model._resnet import _resnet, BasicBlock
 def lipschitz_cal(model, dataset):
     for i, cluster in enumerate(dataset):
         datapoint = []
-        for i in range(150):
+        for j in range(150):
             datapoint.append(torch.Tensor(cluster['centroid']) + cluster['diameter'] / 2 * torch.rand(*cluster['centroid'].shape))
 
         datapoint = torch.stack(datapoint)
