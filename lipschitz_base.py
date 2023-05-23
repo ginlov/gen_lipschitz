@@ -15,7 +15,7 @@ def lipschitz_cal(model, dataset):
         model.to('cuda')
         model.eval()
         with torch.no_grad():
-            output = model(datapoint.view(150, 3, 32, 32).to('cuda'))
+            output = model(datapoint.view(150, 3, 32, 32).to('cuda')).detach().cpu()
 
         norm_max_output = torch.nn.functional.pdist(output, p=torch.inf)
         norm_max_input = torch.nn.functional.pdist(datapoint, p=torch.inf)
