@@ -55,7 +55,7 @@ if __name__ == "__main__":
     else:
         raise NotImplementedError()
     
-    checkpoint = model.load(args.checkpoint)
+    checkpoint = torch.load(args.checkpoint)
     model.load_state_dict(checkpoint["state_dict"])
     
     dataset = torch.load("cluster_info.pth")
