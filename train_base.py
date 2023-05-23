@@ -23,7 +23,7 @@ def train(model, log_file_name="", clamp_value=-1):
     # num_epoch = 90
     # lr = 1e-3
     num_epoch = 20
-    lr = 0.1
+    lr = 0.01
     weight_decay = 1e-4
     momentum = 0.9
 
