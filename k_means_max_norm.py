@@ -44,7 +44,7 @@ class KMeans:
                 if self.predicted_labels[j] is not None:
                         self.clusters['data'][self.predicted_labels[j]].append(sample)                    
                         self.clusters['labels'][self.predicted_labels[j]].append(self.fit_labels[j])
-                        self.clusters['diameter_list'][self.predicted_label[j]].append(min_dist)
+                        self.clusters['diameter_list'][self.predicted_labels[j]].append(min_dist)
             self.reshape_cluster()
             self.update_centroids()
             self.calculate_loss()
