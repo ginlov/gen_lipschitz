@@ -51,7 +51,7 @@ if __name__ == "__main__":
             norm_layer = torch.nn.BatchNorm2d
         else:
             norm_layer = None
-        model = _resnet(BasicBlock, [2, 2, 2, 2], norm_layer=norm_layer)
+        model = _resnet(BasicBlock, [2, 2, 2, 2], norm_layer=norm_layer, num_classes=10)
     else:
         raise NotImplementedError()
     
