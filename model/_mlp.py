@@ -13,9 +13,7 @@ class MLP(nn.Module):
         super().__init__()
         layers: List[nn.Module] = []
         _in_features = in_features
-        layers += [ModifiedLinear(_in_features, cfg[0]), nn.BatchNorm1d(cfg[0]), nn.ReLU(inplace=True)]
-        _in_features = cfg[0]
-        for v in cfg[1:]:
+        for v in cfg:
             v = cast(int, v)
             linear_layer = ModifiedLinear(_in_features, v)
             if batch_norm:
@@ -26,7 +24,6 @@ class MLP(nn.Module):
         self.features_extractor = nn.Sequential(*layers)
         self.classifier = nn.Sequential(
             ModifiedLinear(_in_features, 32),
-            nn.BatchNorm1d(32),
             nn.ReLU(inplace=True),
             ModifiedLinear(32, num_classes)
         )

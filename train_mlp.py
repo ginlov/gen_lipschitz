@@ -10,7 +10,9 @@ def main():
     parser.add_argument("--clamp_value", type=float, default=-1)
     args = parser.parse_args()
 
-    hidden_layer = [1024, 1024, 512, 512, 512, 256, 256, 128, 128, 64]
+    # hidden_layer = [1024, 1024, 512, 512, 512, 256, 256, 128, 128, 64]
+    hidden_layer = [512] * 10
+
     if args.model_type == 0:
         ###################
         ## No Batch Norm ##
