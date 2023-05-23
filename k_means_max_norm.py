@@ -48,7 +48,7 @@ class KMeans:
             self.reshape_cluster()
             self.update_centroids()
             self.calculate_loss()
-            print("\nIteration:",self.iterations,'Loss:',self.loss,'Difference:',self.centroids_dist)
+            print("\nIteration:",self.iterations,'Loss:',self.loss)
             self.iterations+=1
         self.calculate_accuracy()
 

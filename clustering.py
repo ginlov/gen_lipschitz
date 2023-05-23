@@ -8,7 +8,7 @@ def main():
         return img * 2 - 1.0
     
     train_dataset = datasets.CIFAR10(root="cifar_train", train=True,
-                                     transform=transform.Compose([
+                                     transform=transforms.Compose([
                                          transforms.ToTensor(),
                                          transform,
                                      ]),
@@ -32,7 +32,7 @@ def main():
     
     for data in val_loader:
         fit_data = data[0].detach().cpu().numpy()
-        fit_label = data[1].detach().cpy().numpy()
+        fit_label = data[1].detach().cpu().numpy()
 
     kmeans = KMeans(n_clusters=10, max_iter=200)
     kmeans.fit(fit_data, fit_label)
