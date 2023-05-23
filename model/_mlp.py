@@ -22,7 +22,11 @@ class MLP(nn.Module):
                 layers += [linear_layer, nn.ReLU(inplace=True)]
             _in_features = v
         self.features_extractor = nn.Sequential(*layers)
-        self.classifier = ModifiedLinear(_in_features, num_classes)
+        self.classifier = nn.Sequential(
+            ModifiedLinear(_in_features, 32),
+            nn.ReLU(inplace=True),
+            ModifiedLinear(32, num_classes)
+        )
 
     def forward(self, x):
         x = torch.flatten(x, 1)
