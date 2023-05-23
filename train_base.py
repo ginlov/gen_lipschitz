@@ -21,7 +21,7 @@ def train(model, log_file_name="", clamp_value=-1):
     batch_size = 64
     workers = 5
     # num_epoch = 90
-    lr = 1e-5
+    lr = 0.01
     num_epoch = 20
     # lr = 0.01
     weight_decay = 1e-4
