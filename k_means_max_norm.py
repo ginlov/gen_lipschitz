@@ -47,6 +47,7 @@ class KMeans:
                         self.clusters['diameter_list'][self.predicted_labels[j]].append(min_dist)
             self.reshape_cluster()
             self.update_centroids()
+            self.update_diameter()
             self.calculate_loss()
             print("\nIteration:",self.iterations,'Loss:',self.loss)
             self.iterations+=1
