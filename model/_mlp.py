@@ -13,7 +13,9 @@ class MLP(nn.Module):
         super().__init__()
         layers: List[nn.Module] = []
         _in_features = in_features
-        for v in cfg:
+        layers += [ModifiedLinear(_in_features, cfg[0]), nn.BatchNorm1d(cfg[0]), nn.ReLU(inplace=True)]
+        _in_features = cfg[0]
+        for v in cfg[1:]:
             v = cast(int, v)
             linear_layer = ModifiedLinear(_in_features, v)
             if batch_norm:
