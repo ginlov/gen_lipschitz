@@ -60,12 +60,12 @@ class KMeans:
             cluster = self.clusters['data'][i]
             if cluster == []:
                 self.centroids[i] = self.fit_data[np.random.choice(range(len(self.fit_data)))]
+                self.diameter[i] = 0.0
             elif cluster.shape[0] == 1:
                 self.centroids[i] = cluster[0]
+                self.diameter[i] = 0.0
             else:
                 #self.centroids[i] = np.mean(np.vstack((self.centroids[i],cluster)),axis=0)
-                print(cluster.shape)
-                print(cluster)
                 distance = torch.nn.functional.pdist(torch.Tensor(cluster), torch.inf)
                 arg_max = torch.argmax(distance).item()
                 first_point = 0
@@ -81,7 +81,8 @@ class KMeans:
                         second_point = first_point + (arg_max - count_)
                         count_ += num_add
                 self.centroids[i] = np.mean([cluster[first_point], cluster[second_point]])
-    
+                self.diameter[i] = torch.max(distance) / 2
+
     def reshape_cluster(self):
         for id,mat in list(self.clusters['data'].items()):
             self.clusters['data'][id] = np.array(mat)
