@@ -45,10 +45,10 @@ class KMeans:
                 if self.predicted_labels[j] is not None:
                         self.clusters['data'][self.predicted_labels[j]].append(sample)                    
                         self.clusters['labels'][self.predicted_labels[j]].append(self.fit_labels[j])
-                        #self.clusters['diameter_list'][self.predicted_labels[j]].append(min_dist)
+                        self.clusters['diameter_list'][self.predicted_labels[j]].append(min_dist)
             self.reshape_cluster()
             self.update_centroids()
-            #self.update_diameter()
+            self.update_diameter()
             self.calculate_loss()
             print(f"diameter {self.diameter}")
             print("\nIteration:",self.iterations,'Loss:',self.loss)
@@ -65,23 +65,23 @@ class KMeans:
                 self.centroids[i] = cluster[0]
                 self.diameter[i] = 0.0
             else:
-                #self.centroids[i] = np.mean(np.vstack((self.centroids[i],cluster)),axis=0)
-                distance = torch.nn.functional.pdist(torch.Tensor(cluster), torch.inf)
-                arg_max = torch.argmax(distance).item()
-                first_point = 0
-                second_point = 0
-                count_ = 0
-                num_add = cluster.shape[0]-1
-                while count_ < arg_max:
-                    if count_ + num_add < arg_max:
-                        count_ += num_add
-                        num_add -= 1
-                        first_point += 1
-                    else:
-                        second_point = first_point + (arg_max - count_)
-                        count_ += num_add
-                self.centroids[i] = np.mean([cluster[first_point], cluster[second_point]])
-                self.diameter[i] = torch.max(distance) / 2
+                self.centroids[i] = np.mean(np.vstack((self.centroids[i],cluster)),axis=0)
+                # distance = torch.nn.functional.pdist(torch.Tensor(cluster), torch.inf)
+                # arg_max = torch.argmax(distance).item()
+                # first_point = 0
+                # second_point = 0
+                # count_ = 0
+                # num_add = cluster.shape[0]-1
+                # while count_ < arg_max:
+                #     if count_ + num_add < arg_max:
+                #         count_ += num_add
+                #         num_add -= 1
+                #         first_point += 1
+                #     else:
+                #         second_point = first_point + (arg_max - count_)
+                #         count_ += num_add
+                # self.centroids[i] = np.mean([cluster[first_point], cluster[second_point]])
+                # self.diameter[i] = torch.max(distance) / 2
 
     def reshape_cluster(self):
         for id,mat in list(self.clusters['data'].items()):
