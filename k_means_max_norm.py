@@ -45,10 +45,10 @@ class KMeans:
                 if self.predicted_labels[j] is not None:
                         self.clusters['data'][self.predicted_labels[j]].append(sample)                    
                         self.clusters['labels'][self.predicted_labels[j]].append(self.fit_labels[j])
-                        self.clusters['diameter_list'][self.predicted_labels[j]].append(min_dist)
+                        #self.clusters['diameter_list'][self.predicted_labels[j]].append(min_dist)
             self.reshape_cluster()
             self.update_centroids()
-            self.update_diameter()
+            #self.update_diameter()
             self.calculate_loss()
             print(f"diameter {self.diameter}")
             print("\nIteration:",self.iterations,'Loss:',self.loss)
@@ -58,7 +58,7 @@ class KMeans:
     def update_centroids(self):
         for i in range(self.n_clusters):
             cluster = self.clusters['data'][i]
-            if cluster == []:
+            if cluster.shape[0] == 0:
                 self.centroids[i] = self.fit_data[np.random.choice(range(len(self.fit_data)))]
                 self.diameter[i] = 0.0
             elif cluster.shape[0] == 1:
