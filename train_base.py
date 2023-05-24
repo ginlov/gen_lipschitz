@@ -327,7 +327,7 @@ def log_var_mean(model, epoch, batch):
 
 def clamp_batch_norm(model, clamp_value):
     def process_layer(layer, clamp_value_):
-        if isinstance(layer, torch.nn.BatchNorm2d):
+        if isinstance(layer, torch.nn.BatchNorm2d) or isinstance(layer, torch.nn.BatchNorm1d):
             layer.weight.clamp_(min=-clamp_value_, max=clamp_value_)
         elif len(list(layer.children())) > 0:
             for child in layer.children():
