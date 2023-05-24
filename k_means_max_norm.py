@@ -1,6 +1,7 @@
 import numpy as np
 import copy
 from tqdm import tqdm
+import torch
 class KMeans:
     
     def __init__(self,n_clusters=10,max_iter=500):
@@ -59,8 +60,25 @@ class KMeans:
             cluster = self.clusters['data'][i]
             if cluster == []:
                 self.centroids[i] = self.fit_data[np.random.choice(range(len(self.fit_data)))]
+            elif cluster.shape[0] == 1:
+                self.centroids[i] = cluster[0]
             else:
-                self.centroids[i] = np.mean(np.vstack((self.centroids[i],cluster)),axis=0)
+                #self.centroids[i] = np.mean(np.vstack((self.centroids[i],cluster)),axis=0)
+                distance = torch.nn.functional.pdist(cluster, torch.inf)
+                arg_max = torch.argmax(distance)
+                first_point = 0
+                second_point = 0
+                count_ = 0
+                num_add = cluster.shape[0]-1
+                while count_ < arg_max:
+                    if count_ + num_add < arg_max:
+                        count_ += num_add
+                        num_add -= 1
+                        first_point += 1
+                    else:
+                        second_point = first_point + (arg_max - count_)
+                        count_ += num_add
+                self.centroids[i] = np.mean([cluster[first_point], cluster[second_point]])
     
     def reshape_cluster(self):
         for id,mat in list(self.clusters['data'].items()):
