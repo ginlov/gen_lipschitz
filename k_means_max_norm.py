@@ -64,6 +64,8 @@ class KMeans:
                 self.centroids[i] = cluster[0]
             else:
                 #self.centroids[i] = np.mean(np.vstack((self.centroids[i],cluster)),axis=0)
+                print(cluster.shape)
+                print(cluster)
                 distance = torch.nn.functional.pdist(torch.Tensor(cluster), torch.inf)
                 arg_max = torch.argmax(distance).item()
                 first_point = 0
