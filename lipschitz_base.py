@@ -19,9 +19,13 @@ def lipschitz_cal(model, dataset):
 
         norm_max_output = torch.nn.functional.pdist(output, p=torch.inf)
         norm_max_input = torch.nn.functional.pdist(datapoint, p=torch.inf)
+        norm_1_input = torch.nn.functional.pdist(datapoint, p=1)
+        norm_2_input = torch.nn.functional.pdist(datapoint, p=2)
 
         lipschitz = norm_max_output / norm_max_input
         dataset[i]['lipschitz_const'] = torch.max(lipschitz).item()  
+        dataset[i]['lipschitz_const_1'] = torch.max(norm_max_output / norm_1_input).item()
+        dataset[i]['lipschitz_const_2'] = torch.max(norm_max_output/ norm_2_input).item()
 
     return dataset
 
