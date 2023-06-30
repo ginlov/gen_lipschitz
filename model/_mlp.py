@@ -37,6 +37,6 @@ class MLP(nn.Module):
         x = self.classifier(x)
         return x
 
-def _mlp(in_features: int, cfg: List[Union[int, str]], norm_layer=None, num_classes: int, **kwargs: Any) -> MLP:
+def _mlp(in_features: int, cfg: List[Union[int, str]], norm_layer, num_classes: int, **kwargs: Any) -> MLP:
     model = MLP(in_features, cfg, norm_layer, num_classes)
     return model
