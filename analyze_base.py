@@ -56,6 +56,8 @@ def analyze(log_file, batch_norm, model):
     fig.tight_layout()
     if batch_norm == "BN":
         plt.savefig(f"image/{model}_{batch_norm}.png", dpi=250)
+    elif batch_norm == "GN":
+        plt.savefig(f"image/{model}_{batch_norm}.png", dpi=250)
     else:
         plt.savefig(f"image/{model}_without_batch_norm.png", dpi=250)
 
@@ -99,6 +101,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=int, default=0)
     parser.add_argument("--model_type", type=int, default=0)
+    parser.add_argument("--norm_type", type=str, default="batch")
 
     args = parser.parse_args()
 
@@ -118,8 +121,12 @@ if __name__ == "__main__":
         batch_norm = "w/o BN"
         log_file = f"{model}_no_batch_norm.log"
     elif args.model_type == 2:
-        batch_norm = "BN"
-        log_file = f"{model}_batch_norm.log"
+        if args.norm_type == "batch":
+            batch_norm = "BN"
+            log_file = f"{model}_batch_norm.log"
+        elif args.norm_type =="group":
+            batch_norm = "GN"
+            log_file = f"{model}_group_norm.log"
     else:
         raise NotImplementedError()
 
