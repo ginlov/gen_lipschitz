@@ -27,6 +27,8 @@ def main():
             norm_layer = nn.BatchNorm2d
         elif args.norm_type == "group":
             norm_layer = nn.GroupNorm
+        elif args.norm_type == "layer":
+            norm_layer = nn.LayerNorm
         model = _vgg("D", norm_layer=norm_layer, init_weights=True, num_classes=10)
         log_file_name = "vgg_batch_norm.log"
         if args.clamp_value != -1:

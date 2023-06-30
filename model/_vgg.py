@@ -61,6 +61,8 @@ def make_layers(cfg: List[Union[str, int]], norm_layer=None) -> nn.Sequential:
                     layers += [conv2d, nn.BatchNorm2d(v), nn.ReLU(inplace=True)]
                 elif norm_layer == nn.GroupNorm:
                     layers += [conv2d, nn.GroupNorm(int(v/2), v), nn.ReLU(inplace=True)]
+                elif norm_layer == nn.LayerNorm:
+                    layers += [conv2d, nn.GroupNorm(1, v), nn.ReLU(inplace=True)]
             else:
                 layers += [conv2d, nn.ReLU(inplace=True)]
             in_channels = v
