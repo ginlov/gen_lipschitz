@@ -47,7 +47,7 @@ class VGG(nn.Module):
         return x
 
 
-def make_layers(cfg: List[Union[str, int]], batch_norm: bool = False) -> nn.Sequential:
+def make_layers(cfg: List[Union[str, int]], norm_layer=None) -> nn.Sequential:
     layers: List[nn.Module] = []
     in_channels = 3
     for v in cfg:
@@ -56,13 +56,16 @@ def make_layers(cfg: List[Union[str, int]], batch_norm: bool = False) -> nn.Sequ
         else:
             v = cast(int, v)
             conv2d = ModifiedConv2d(in_channels, v, kernel_size=3, padding=1)
-            if batch_norm:
-                layers += [conv2d, nn.BatchNorm2d(v), nn.ReLU(inplace=True)]
+            if norm_layer is not None:
+                if norm_layer == nn.BatchNorm2d:
+                    layers += [conv2d, nn.BatchNorm2d(v), nn.ReLU(inplace=True)]
+                elif norm_layer == nn.GroupNorm:
+                    layers += [conv2d, nn.GroupNorm(int(v/2), v), nn.ReLU(inplace=True)]
             else:
                 layers += [conv2d, nn.ReLU(inplace=True)]
             in_channels = v
     return nn.Sequential(*layers)
 
-def _vgg(cfg: str, batch_norm: bool, **kwargs: Any) -> VGG:
-    model = VGG(make_layers(cfgs[cfg], batch_norm=batch_norm), **kwargs)
+def _vgg(cfg: str, norm_layer, **kwargs: Any) -> VGG:
+    model = VGG(make_layers(cfgs[cfg], norm_layer=norm_layer), **kwargs)
     return model
