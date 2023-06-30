@@ -59,7 +59,7 @@ def analyze(log_file, batch_norm, model):
     elif batch_norm == "GN":
         plt.savefig(f"image/{model}_{batch_norm}.png", dpi=250)
     elif batch_norm == "LN":
-        plt.savefif(f"image/{model}_{batch_norm}.png", dpi=250)
+        plt.savefig(f"image/{model}_{batch_norm}.png", dpi=250)
     else:
         plt.savefig(f"image/{model}_without_batch_norm.png", dpi=250)
 
