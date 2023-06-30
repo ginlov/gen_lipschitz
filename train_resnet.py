@@ -34,6 +34,8 @@ def main():
             norm_layer = nn.BatchNorm2d
         elif args.norm_type == "group":
             norm_layer = nn.GroupNorm
+        elif args.norm_type == "layer":
+            norm_layer = nn.LayerNorm
         model = _resnet(BasicBlock, [2, 2, 2, 2], norm_layer=norm_layer, num_classes=10)
         log_file_name = "resnet_batch_norm.log"
         if args.clamp_value != -1:
