@@ -50,6 +50,8 @@ class BasicBlock(nn.Module):
                 self.bn1 = norm_layer(planes)
             elif norm_layer == nn.GroupNorm:
                 self.bn1 = norm_layer(int(planes / 2), planes)
+            elif norm_layer == nn.LayerNorm:
+                self.bn1 = nn.GroupNorm(1, planes)
         else:
             self.bn1 = None
         self.relu = nn.ReLU(inplace=True)
@@ -59,6 +61,8 @@ class BasicBlock(nn.Module):
                 self.bn2 = norm_layer(planes)
             elif norm_layer == nn.GroupNorm:
                 self.bn2 = norm_layer(int(planes / 2), planes)
+            elif norm_layer == nn.LayerNorm:
+                self.bn2 = nn.GroupNorm(1, planes)
         else:
             self.bn2 = None
         self.downsample = downsample
@@ -183,6 +187,8 @@ class ResNet(nn.Module):
                 self.bn1 = norm_layer(self.inplanes)
             elif norm_layer == nn.GroupNorm:
                 self.bn1 = norm_layer(int(self.inplanes / 2), self.inplanes)
+            elif norm_layer == nn.LayerNorm:
+                self.bn1 = nn.GroupNorm(1, self.inplanes)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = ModifiedMaxPool2d(kernel_size=3, stride=2, padding=1)
 
@@ -238,6 +244,8 @@ class ResNet(nn.Module):
                     downsample_list.append(norm_layer(planes * block.expansion))
                 elif norm_layer == nn.GroupNorm:
                     downsample_list.append(norm_layer(int(planes * block.expansion / 2), planes * block.expansion))
+                elif norm_layer == nn.LayerNorm:
+                    downsample_list.append(nn.GroupNorm(1, planes * block.expansion))
             # downsample = nn.Sequential(
             #     conv1x1(self.inplanes, planes * block.expansion, stride),
             #     norm_layer(planes * block.expansion),
