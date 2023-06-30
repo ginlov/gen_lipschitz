@@ -8,7 +8,7 @@ class MLP(nn.Module):
     def __init__(self, 
                  in_features: int,
                  cfg: List[Union[str, int]], 
-                 batch_norm: bool = False,
+                 norm_layer = None,
                  num_classes: int = 1000) -> None:
         super().__init__()
         layers: List[nn.Module] = []
@@ -16,8 +16,11 @@ class MLP(nn.Module):
         for v in cfg:
             v = cast(int, v)
             linear_layer = ModifiedLinear(_in_features, v)
-            if batch_norm:
-                layers += [linear_layer, nn.BatchNorm1d(v), nn.ReLU(inplace=True)]
+            if norm_layer is not None:
+                if norm_layer == nn.BatchNorm1d:
+                    layers += [linear_layer, nn.BatchNorm1d(v), nn.ReLU(inplace=True)]
+                elif norm_layer == nn.GroupNorm:
+                    layers += [linear_layer, nn.GroupNorm(int(v/2), v), nn.ReLU(inplace=True)]
             else:
                 layers += [linear_layer, nn.ReLU(inplace=True)]
             _in_features = v
@@ -34,6 +37,6 @@ class MLP(nn.Module):
         x = self.classifier(x)
         return x
 
-def _mlp(in_features: int, cfg: List[Union[int, str]], batch_norm: bool, num_classes: int, **kwargs: Any) -> MLP:
-    model = MLP(in_features, cfg, batch_norm, num_classes)
+def _mlp(in_features: int, cfg: List[Union[int, str]], norm_layer=None, num_classes: int, **kwargs: Any) -> MLP:
+    model = MLP(in_features, cfg, norm_layer, num_classes)
     return model
