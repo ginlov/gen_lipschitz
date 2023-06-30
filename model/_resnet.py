@@ -55,7 +55,10 @@ class BasicBlock(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.conv2 = conv3x3(planes, planes)
         if norm_layer is not None:
-            self.bn2 = norm_layer(planes)
+            if norm_layer == nn.BatchNorm2d:
+                self.bn2 = norm_layer(planes)
+            elif norm_layer == nn.GroupNorm:
+                self.bn2 = norm_layer(int(planes / 2), planes)
         else:
             self.bn2 = None
         self.downsample = downsample
