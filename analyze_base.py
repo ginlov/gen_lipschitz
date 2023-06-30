@@ -58,6 +58,8 @@ def analyze(log_file, batch_norm, model):
         plt.savefig(f"image/{model}_{batch_norm}.png", dpi=250)
     elif batch_norm == "GN":
         plt.savefig(f"image/{model}_{batch_norm}.png", dpi=250)
+    elif batch_norm == "LN":
+        plt.savefif(f"image/{model}_{batch_norm}.png", dpi=250)
     else:
         plt.savefig(f"image/{model}_without_batch_norm.png", dpi=250)
 
@@ -127,6 +129,9 @@ if __name__ == "__main__":
         elif args.norm_type =="group":
             batch_norm = "GN"
             log_file = f"{model}_group_norm.log"
+        elif args.norm_type == "layer":
+            batch_norm = "LN"
+            log_file = f"{model}_layer_norm.log"
     else:
         raise NotImplementedError()
 
