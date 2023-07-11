@@ -51,7 +51,6 @@ def start_train(
     
     model = MODEL_MAP[args.model](**config)
 
-
     ## training
     if args.model_type == 0:
         norm = "wo_norm"
@@ -70,7 +69,7 @@ def start_train(
     train(**training_config)
 
 
-def main():
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     add_dict_to_argparser(parser, default_config())
     
