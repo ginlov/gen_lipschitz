@@ -161,9 +161,6 @@ class ResNet(nn.Module):
         signal = -1
     ) -> None:
         super().__init__()
-        # _log_api_usage_once(self)
-        # if norm_layer is None:
-        #     norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
 
         self.inplanes = 64
@@ -197,9 +194,9 @@ class ResNet(nn.Module):
         else:
             must_norm = False
         self.layer1 = self._make_layer(block, 64, layers[0], must_norm=must_norm)
-        self.layer2 = self._make_layer(block, 128, layers[1], stride=2, dilate=replace_stride_with_dilation[0])
+        self.layer2 = self._make_layer(block, 128, layers[1], stride=2, dilate=replace_stride_with_dilation[0], must_norm=must_norm)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1], must_norm=must_norm)
-        self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2])
+        self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2], must_norm=must_norm, final_block=True)
         self.avgpool = ModifiedAdaptiveAvgPool2d((1, 1))
         self.fc = ModifiedLinear(512 * block.expansion, num_classes)
 
@@ -228,6 +225,7 @@ class ResNet(nn.Module):
         stride: int = 1,
         dilate: bool = False,
         must_norm: bool = False,
+        final_block: bool = False, # trick to remove norm layer at final block
     ) -> nn.Sequential:
         norm_layer = self._norm_layer
         if norm_layer is None and must_norm:
@@ -259,6 +257,10 @@ class ResNet(nn.Module):
             )
         )
         self.inplanes = planes * block.expansion
+
+        # Trick to remove norm layer at the last block
+        if final_block:
+            norm_layer = None
         for _ in range(1, blocks):
             layers.append(
                 block(

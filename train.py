@@ -44,6 +44,10 @@ def start_train(
             config["norm_layer"] = nn.LayerNorm
         else:
             raise NotImplementedError("This norm type has not been implemented yet.")
+    elif args.model_type == 1 and args.model == "resnet":
+        config["signal"] = 1
+    elif args.model_type == 1:
+        raise NotImplementedError("This setting is not support for vgg and mlp")
     
     model = MODEL_MAP[args.model](**config)
 
