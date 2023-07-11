@@ -125,7 +125,7 @@ if __name__ == "__main__":
     elif args.model_type == 2:
         if args.norm_type == "batch":
             batch_norm = "BN"
-            log_file = f"{model}_batch_norm.log"
+            log_file = f"{model}_batch.txt"
         elif args.norm_type =="group":
             batch_norm = "GN"
             log_file = f"{model}_group_norm.log"
