@@ -12,7 +12,7 @@ import numpy as np
 import os
 
 
-def train(model, log_file_name="", clamp_value=-1):
+def train(model, log_file_name="", clamp_value=-1, from_checkpoint=False):
     ##############################
     ###### Settings ##############
     ##############################
@@ -63,19 +63,29 @@ def train(model, log_file_name="", clamp_value=-1):
     ## LOADING COMPULSORY COMPONENTS ##
     ###################################
     logger.info("Preparing model")
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    model.to(device)
     loss_fn = nn.CrossEntropyLoss().to(device)
     optimizer = torch.optim.SGD(model.parameters(), lr,
                                 momentum=momentum,
                                 weight_decay=weight_decay)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
     logger.info("Start training")
+    if from_checkpoint:
+        checkpoint = torch.load("model.pth.tar")
+        model.load_state_dict(checkpoint["state_dict"])
+        optimizer.load_state_dict(checkpoint["optimizer"])
+        scheduler.load_state_dict(checkpoint["scheduler"])
+        best_acc1 = checkpoint["best_acc1"]
+        start_epoch = checkpoint["epoch"]
+    else:
+        start_epoch = 0
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model.to(device)
     if not os.path.isdir("variance"):
         os.mkdir("variance")
     if not os.path.isdir("mean"):
         os.mkdir("mean")
-    for i in range(num_epoch):
+    for i in range(start_epoch, num_epoch):
         train_epoch(model, train_loader, optimizer, loss_fn, device, log_file_name, i, clamp_value=clamp_value)
 
         acc1, acc5 = validate_epoch(model, val_loader, loss_fn, device, log_file_name, i)
