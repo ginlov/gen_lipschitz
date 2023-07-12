@@ -14,7 +14,8 @@ def default_config():
         "model": "mlp",
         "model_type": 0,
         "clamp_value": -1.0,
-        "norm_type": "batch"
+        "norm_type": "batch",
+        "from_checkpoint": False,
     }
 
 def add_dict_to_argparser(
@@ -60,7 +61,8 @@ def start_train(
     training_config = {
         "model": model,
         "log_file_name": log_file_name, 
-        "clamp_value": args.clamp_value
+        "clamp_value": args.clamp_value,
+        "from_checkpoint": args.from_checkpoint
     }
 
     if debug:
