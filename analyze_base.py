@@ -114,6 +114,8 @@ if __name__ == "__main__":
         model = "vgg"
     elif args.model == 2:
         model = "resnet"
+    elif args.model == 3:
+        model = "resnet34"
     else:
         raise NotImplementedError()
 
