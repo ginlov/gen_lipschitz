@@ -116,6 +116,8 @@ if __name__ == "__main__":
         model = "resnet"
     elif args.model == 3:
         model = "resnet34"
+    elif args.model == 4:
+        model = "resnet50"
     else:
         raise NotImplementedError()
 
