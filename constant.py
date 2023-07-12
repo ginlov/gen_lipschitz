@@ -1,4 +1,4 @@
-from model._resnet import BasicBlock, _resnet
+from model._resnet import BasicBlock, _resnet, Bottleneck
 from model._vgg import _vgg
 from model._mlp import _mlp
 
@@ -21,6 +21,18 @@ MODEL_CONFIG = {
         "norm_layer": None,
         "num_classes": 10
     },
+    "resnet34": {
+        "block": BasicBlock,
+        "layers": [3, 4, 6, 3],
+        "norm_layer": None,
+        "num_classes": 10
+    },
+    "resnet50": {
+        "block": Bottleneck,
+        "layers": [3, 4, 6, 3],
+        "norm_layer": None,
+        "num_classes": 10,
+    },
     "vgg": {
         "cfg": "D",
         "norm_layer": None,
@@ -37,6 +49,8 @@ MODEL_CONFIG = {
 
 MODEL_MAP = {
     "resnet": _resnet,
+    "resnet34": _resnet,
+    "resnet50": _resnet,
     "mlp": _mlp,
     "vgg": _vgg
 }

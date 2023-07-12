@@ -110,16 +110,43 @@ class Bottleneck(nn.Module):
         norm_layer: Optional[Callable[..., nn.Module]] = None,
     ) -> None:
         super().__init__()
-        if norm_layer is None:
-            norm_layer = nn.BatchNorm2d
+        # if norm_layer is None:
+        #     norm_layer = nn.BatchNorm2d
         width = int(planes * (base_width / 64.0)) * groups
         # Both self.conv2 and self.downsample layers downsample the input when stride != 1
         self.conv1 = conv1x1(inplanes, width)
-        self.bn1 = norm_layer(width)
+        if norm_layer is not None:
+            if norm_layer == nn.BatchNorm2d:
+                self.bn1 = norm_layer(width)
+            elif norm_layer == nn.GroupNorm:
+                self.bn1 = norm_layer(int(width/ 2), width)
+            elif norm_layer == nn.LayerNorm:
+                self.bn1 = nn.GroupNorm(1, width)
+        else:
+            self.bn1 = None
+        # self.bn1 = norm_layer(width)
         self.conv2 = conv3x3(width, width, stride, groups, dilation)
-        self.bn2 = norm_layer(width)
+        if norm_layer is not None:
+            if norm_layer == nn.BatchNorm2d:
+                self.bn2 = norm_layer(width)
+            elif norm_layer == nn.GroupNorm:
+                self.bn2 = norm_layer(int(width/ 2), width)
+            elif norm_layer == nn.LayerNorm:
+                self.bn2 = nn.GroupNorm(1, width)
+        else:
+            self.bn2 = None
+        # self.bn2 = norm_layer(width)
         self.conv3 = conv1x1(width, planes * self.expansion)
-        self.bn3 = norm_layer(planes * self.expansion)
+        if norm_layer is not None:
+            if norm_layer == nn.BatchNorm2d:
+                self.bn3 = norm_layer(planes * self.expansion)
+            elif norm_layer == nn.GroupNorm:
+                self.bn3 = norm_layer(int(planes * self.expansion/ 2), planes * self.expansion)
+            elif norm_layer == nn.LayerNorm:
+                self.bn3 = nn.GroupNorm(1, planes * self.expansion)
+        else:
+            self.bn3 = None
+        # self.bn3 = norm_layer(planes * self.expansion)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
         self.stride = stride
@@ -128,15 +155,18 @@ class Bottleneck(nn.Module):
         identity = x
 
         out = self.conv1(x)
-        out = self.bn1(out)
+        if self.bn1 is not None:
+            out = self.bn1(out)
         out = self.relu(out)
 
         out = self.conv2(out)
-        out = self.bn2(out)
+        if self.bn2 is not None:
+            out = self.bn2(out)
         out = self.relu(out)
 
         out = self.conv3(out)
-        out = self.bn3(out)
+        if self.bn3 is not None:
+            out = self.bn3(out)
 
         if self.downsample is not None:
             identity = self.downsample(x)
