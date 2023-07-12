@@ -63,6 +63,7 @@ def train(model, log_file_name="", clamp_value=-1, from_checkpoint=False):
     ## LOADING COMPULSORY COMPONENTS ##
     ###################################
     logger.info("Preparing model")
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     loss_fn = nn.CrossEntropyLoss().to(device)
     optimizer = torch.optim.SGD(model.parameters(), lr,
                                 momentum=momentum,
@@ -78,8 +79,6 @@ def train(model, log_file_name="", clamp_value=-1, from_checkpoint=False):
         start_epoch = checkpoint["epoch"]
     else:
         start_epoch = 0
-
-    device = "cuda" if torch.cuda.is_available() else "cpu"
     model.to(device)
     if not os.path.isdir("variance"):
         os.mkdir("variance")
