@@ -6,8 +6,9 @@ import argparse
 
 from constant import SELECTED_LAYERS, VISUALIZE_LAYERS
 from matplotlib import pyplot as plt
+from utils import default_config, add_dict_to_argparser
 
-def analyze(log_file, batch_norm, model):
+def analyze(batch_norm, model):
     selected_layers = SELECTED_LAYERS[model]
     visualize_layers = VISUALIZE_LAYERS[model]
     if not os.path.isdir("image"):
@@ -63,80 +64,28 @@ def analyze(log_file, batch_norm, model):
     else:
         plt.savefig(f"image/{model}_without_batch_norm.png", dpi=250)
 
-
-def analyze_log(log):
-    acc1 = []
-    acc5 = []
-    loss = []
-    def analysis_train(log_row):
-        items = log_row.split("\t")
-        for item in items:
-            item = re.sub(" +", " ", item)
-            if "Acc@1" in item:
-                acc1.append(item.split(" ")[1])
-            elif "Acc@5" in item:
-                acc5.append(item.split(" ")[1])
-            elif "Loss" in item:
-                loss.append(item.split(" ")[1])
-                
-    test_acc1 = []
-    test_acc5 = []
-    def analysis_test(log_row):
-        log_row = re.sub(" +", " ", log_row)
-        test_acc1.append(log_row.split()[-3])
-        test_acc5.append(log_row.split()[-1])
-
-    for log_row in log:
-        if "Epoch" in log_row:
-            if int(log_row.split("]")[0].split("[")[1]) > 60:
-                break
-            analysis_train(log_row)
-        elif "*" in log_row:
-            analysis_test(log_row)
-    acc1 = [float(acc1[i]) for i in range(488) if i % 8 == 7]
-    acc5 = [float(acc5[i]) for i in range(488) if i % 8 == 7]
-    loss = [float(loss[i]) for i in range(488) if i % 8 == 7]
-
-    return acc1, acc5, loss, test_acc1, test_acc5
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=int, default=0)
-    parser.add_argument("--model_type", type=int, default=0)
-    parser.add_argument("--norm_type", type=str, default="batch")
+    add_dict_to_argparser(parser, default_config())
 
     args = parser.parse_args()
-
-    model = ""
-    if args.model == 0:
-        model = "mlp"
-    elif args.model == 1:
-        model = "vgg"
-    elif args.model == 2:
-        model = "resnet"
-    elif args.model == 3:
-        model = "resnet34"
-    elif args.model == 4:
-        model = "resnet50"
-    else:
-        raise NotImplementedError()
 
     batch_norm = ""
     log_file = ""
     if args.model_type == 0:
         batch_norm = "w/o BN"
-        log_file = f"{model}_no_batch_norm.log"
+        log_file = f"{args.model}_wo_norm.txt"
     elif args.model_type == 2:
         if args.norm_type == "batch":
             batch_norm = "BN"
-            log_file = f"{model}_batch.txt"
+            log_file = f"{args.model}_batch.txt"
         elif args.norm_type =="group":
             batch_norm = "GN"
-            log_file = f"{model}_group.txt"
+            log_file = f"{args.model}_group.txt"
         elif args.norm_type == "layer":
             batch_norm = "LN"
-            log_file = f"{model}_layer.txt"
+            log_file = f"{args.model}_layer.txt"
     else:
         raise NotImplementedError()
 
-    analyze(log_file, batch_norm, model)
+    analyze(batch_norm, args.model)

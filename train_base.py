@@ -12,7 +12,7 @@ import numpy as np
 import os
 
 
-def train(model, log_file_name="", clamp_value=-1, from_checkpoint=False):
+def train(model, log_file_name="", log_folder="log", clamp_value=-1, from_checkpoint=False):
     ##############################
     ###### Settings ##############
     ##############################
@@ -85,7 +85,7 @@ def train(model, log_file_name="", clamp_value=-1, from_checkpoint=False):
     if not os.path.isdir("mean"):
         os.mkdir("mean")
     for i in range(start_epoch, num_epoch):
-        train_epoch(model, train_loader, optimizer, loss_fn, device, log_file_name, i, clamp_value=clamp_value)
+        train_epoch(model, train_loader, optimizer, loss_fn, device, log_file_name, log_folder, i, clamp_value=clamp_value)
 
         acc1, acc5 = validate_epoch(model, val_loader, loss_fn, device, log_file_name, i)
 
@@ -105,7 +105,7 @@ def train(model, log_file_name="", clamp_value=-1, from_checkpoint=False):
         )
 
 
-def train_epoch(model, train_loader, optimizer, loss_fn, device, log_file, epoch, clamp_value=-1):
+def train_epoch(model, train_loader, optimizer, loss_fn, device, log_file, log_folder, epoch, clamp_value=-1):
     batch_time = AverageMeter("Time", ":6.3f")
     data_time = AverageMeter("Data", ":6.3f")
     losses = AverageMeter('Loss', ':.4e')
@@ -154,9 +154,9 @@ def train_epoch(model, train_loader, optimizer, loss_fn, device, log_file, epoch
             progress.display(i + 1)
 
         if (i+1) % 30 == 0 and epoch < 4:
-            log_var_mean(model, epoch, i)
+            log_var_mean(model, log_folder, epoch, i)
         elif (i+1) % 100 == 0:
-            log_var_mean(model, epoch, i)
+            log_var_mean(model, log_folder, epoch, i)
 
 
 def validate_epoch(model, valid_loader, loss_fn, device, log_file, epoch):
@@ -318,7 +318,9 @@ def cal_weight_norm(model, norm='max'):
     cum_prod = process_layer(model, norm)
     return cum_prod
 
-def log_var_mean(model, epoch, batch):
+def log_var_mean(model, log_folder, epoch, batch):
+    if not os.path.exists(log_folder):
+        os.mkdir(log_folder)
     variance = []
     mean = []
     def process_layer(layer):
@@ -330,8 +332,8 @@ def log_var_mean(model, epoch, batch):
                 process_layer(each)
 
     process_layer(model)
-    torch.save(variance, f"variance/variance_{epoch}_{batch}.pth")
-    torch.save(mean, f"mean/mean_{epoch}_{batch}.pth")
+    torch.save(variance, f"{log_folder}/variance/variance_{epoch}_{batch}.pth")
+    torch.save(mean, f"{log_folder}/mean/mean_{epoch}_{batch}.pth")
 
 
 def clamp_batch_norm(model, clamp_value):

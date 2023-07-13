@@ -5,26 +5,10 @@ from model._mlp import _mlp
 from model._resnet import _resnet
 from model._vgg import _vgg
 from constant import MODEL_CONFIG, MODEL_MAP
+from utils import default_config, add_dict_to_argparser
 
 import argparse
 
-
-def default_config():
-    return {
-        "model": "mlp",
-        "model_type": 0,
-        "clamp_value": -1.0,
-        "norm_type": "batch",
-        "from_checkpoint": False,
-    }
-
-def add_dict_to_argparser(
-    parser: argparse.ArgumentParser,
-    config_dict: Dict
-    ):
-    for k, v in config_dict.items():
-        v_type = type(v)
-        parser.add_argument(f"--{k}", type=v_type, default=v)
 
 def start_train(
         args: argparse.Namespace,
@@ -58,18 +42,19 @@ def start_train(
     else:
         norm = args.norm_type
     log_file_name = "_".join([args.model, norm]) + ".txt" 
+    log_folder = "_".join([args.model, norm])
     training_config = {
         "model": model,
         "log_file_name": log_file_name, 
         "clamp_value": args.clamp_value,
-        "from_checkpoint": args.from_checkpoint
+        "from_checkpoint": args.from_checkpoint,
+        "log_folder": log_folder
     }
 
     if debug:
         return config, training_config
 
     train(**training_config)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
