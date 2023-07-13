@@ -132,10 +132,10 @@ if __name__ == "__main__":
             log_file = f"{model}_batch.txt"
         elif args.norm_type =="group":
             batch_norm = "GN"
-            log_file = f"{model}_group_norm.log"
+            log_file = f"{model}_group.txt"
         elif args.norm_type == "layer":
             batch_norm = "LN"
-            log_file = f"{model}_layer_norm.log"
+            log_file = f"{model}_layer.txt"
     else:
         raise NotImplementedError()
 
