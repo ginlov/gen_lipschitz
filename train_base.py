@@ -29,6 +29,7 @@ def train(model, log_file_name="", log_folder="log", clamp_value=-1, from_checkp
     ### LOADING DATASET ###########
     ###############################
     logger.info("Loading data")
+
     def transform(img: torch.Tensor):
         return img * 2 - 1.0 
 
@@ -39,11 +40,11 @@ def train(model, log_file_name="", log_folder="log", clamp_value=-1, from_checkp
                                      transform,
                                      ]),
                                      download=True)
-    val_dataset = datasets.CIFAR10(root="cifar_val", train=False, 
+    val_dataset = datasets.CIFAR10(root="cifar_val",
+                                   train=False,
                                    transform=transforms.Compose([
-                                   # transforms.RandomHorizontalFlip(),
-                                   transforms.ToTensor(),
-                                   transform,
+                                       transforms.ToTensor(),
+                                       transform
                                    ]),
                                    download=True)
 
@@ -76,10 +77,12 @@ def train(model, log_file_name="", log_folder="log", clamp_value=-1, from_checkp
     else:
         start_epoch = 0
     model.to(device)
-    if not os.path.isdir("variance"):
-        os.mkdir("variance")
-    if not os.path.isdir("mean"):
-        os.mkdir("mean")
+    if not os.path.exists(log_folder):
+        os.mkdir(log_folder)
+    if not os.path.isdir(f"{log_folder}/variance"):
+        os.mkdir(f"{log_folder}/variance")
+    if not os.path.isdir(f"{log_folder}/mean"):
+        os.mkdir(f"{log_folder}/mean")
     for i in range(start_epoch, num_epoch):
         train_epoch(model, train_loader, optimizer, loss_fn, device, log_file_name, log_folder, i, clamp_value=clamp_value)
 
@@ -315,8 +318,6 @@ def cal_weight_norm(model, norm='max'):
     return cum_prod
 
 def log_var_mean(model, log_folder, epoch, batch):
-    if not os.path.exists(log_folder):
-        os.mkdir(log_folder)
     variance = []
     mean = []
     def process_layer(layer):

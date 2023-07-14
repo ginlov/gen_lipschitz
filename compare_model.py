@@ -95,7 +95,7 @@ def compare_acc(
     )
 
 
-def variance_compare(
+def compare_variance(
         model,
         norm_type,
         log_folder,
@@ -167,3 +167,7 @@ if __name__ == "__main__":
 
     # draw accuracy
     compare_acc(log_wo_norm=log_wo_norm, log_norm=log_file, model=args.model, norm_type=args.norm_type)
+
+    # draw variance chart
+    compare_variance(model=args.model, norm_type=args.norm_type, log_folder=log_folder,
+                     log_folder_wo_norm=log_folder_wo_norm)
