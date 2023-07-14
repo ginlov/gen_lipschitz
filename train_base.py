@@ -20,10 +20,8 @@ def train(model, log_file_name="", log_folder="log", clamp_value=-1, from_checkp
     best_acc1 = 0.0
     batch_size = 64
     workers = 5
-    # num_epoch = 90
     lr = 0.01
     num_epoch = 40
-    # lr = 0.01
     weight_decay = 1e-4
     momentum = 0.9
 
@@ -31,8 +29,6 @@ def train(model, log_file_name="", log_folder="log", clamp_value=-1, from_checkp
     ### LOADING DATASET ###########
     ###############################
     logger.info("Loading data")
-    # normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-    #                                  std=[0.229, 0.224, 0.225])
     def transform(img: torch.Tensor):
         return img * 2 - 1.0 
 
@@ -334,7 +330,6 @@ def log_var_mean(model, log_folder, epoch, batch):
     process_layer(model)
     torch.save(variance, f"{log_folder}/variance/variance_{epoch}_{batch}.pth")
     torch.save(mean, f"{log_folder}/mean/mean_{epoch}_{batch}.pth")
-
 
 def clamp_batch_norm(model, clamp_value):
     def process_layer(layer, clamp_value_):

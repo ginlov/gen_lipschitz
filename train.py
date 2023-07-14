@@ -12,20 +12,19 @@ import argparse
 
 def start_train(
         args: argparse.Namespace,
-        debug:bool=False
+        debug: bool = False
     ):
-
-    ## create model
+    # create model
     config = MODEL_CONFIG[args.model]
     if args.model_type == 2:
-        if args.norm_type== "batch":
+        if args.norm_type == "BN":
             if args.model == "mlp":
                 config["norm_layer"] = nn.BatchNorm1d
             else:
                 config["norm_layer"] = nn.BatchNorm2d
-        elif args.norm_type == "group":
+        elif args.norm_type == "GN":
             config["norm_layer"] = nn.GroupNorm
-        elif args.norm_type == "layer":
+        elif args.norm_type == "LN":
             config["norm_layer"] = nn.LayerNorm
         else:
             raise NotImplementedError("This norm type has not been implemented yet.")
@@ -36,13 +35,13 @@ def start_train(
     
     model = MODEL_MAP[args.model](**config)
 
-    ## training
+    # training
     if args.model_type == 0:
-        norm = "wo_norm"
+        norm_type = "wo_norm"
     else:
-        norm = args.norm_type
-    log_file_name = "_".join([args.model, norm]) + ".txt" 
-    log_folder = "_".join([args.model, norm])
+        norm_type = args.norm_type
+    log_file_name = "_".join([args.model, norm_type]) + ".txt"
+    log_folder = "_".join([args.model, norm_type])
     training_config = {
         "model": model,
         "log_file_name": log_file_name, 
@@ -55,6 +54,7 @@ def start_train(
         return config, training_config
 
     train(**training_config)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

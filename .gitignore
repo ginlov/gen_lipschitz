@@ -3,3 +3,4 @@ cifar_train/
 cifar_val/
 *.pth
 notebook/*
+.idea/
