@@ -100,7 +100,8 @@ def train(model, log_file_name="", log_folder="log", clamp_value=-1, from_checkp
                 'optimizer': optimizer.state_dict(),
                 'scheduler': scheduler.state_dict(),
             },
-            is_best
+            is_best,
+            log_folder
         )
 
 
@@ -199,16 +200,18 @@ def validate_epoch(model, valid_loader, loss_fn, device, log_file, epoch):
     return top1.avg, top5.avg
 
 
-def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
-    torch.save(state, filename)
+def save_checkpoint(state, is_best, log_folder, filename='checkpoint.pth.tar'):
+    torch.save(state, os.path.join(log_folder, filename))
     if is_best:
-        shutil.copyfile(filename, 'model_best.pth.tar')
+        shutil.copyfile(os.path.join(log_folder, filename), os.path.join(log_folder, 'model_best.pth.tar'))
+
 
 class Summary(Enum):
     NONE = 0
     AVERAGE = 1
     SUM = 2
     COUNT = 3
+
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
@@ -258,6 +261,7 @@ class AverageMeter(object):
         
         return fmtstr.format(**self.__dict__)
 
+
 class ProgressMeter(object):
     def __init__(self, num_batches, meters, prefix="", log_file_name=""):
         self.batch_fmtstr = self._get_batch_fmtstr(num_batches)
@@ -285,6 +289,7 @@ class ProgressMeter(object):
         fmt = '{:' + str(num_digits) + 'd}'
         return '[' + fmt + '/' + fmt.format(num_batches) + ']'
 
+
 def accuracy(output, target, topk=(1,)):
     """Computes the accuracy over the k top predictions for the specified values of k"""
     with torch.no_grad():
@@ -300,6 +305,7 @@ def accuracy(output, target, topk=(1,)):
             correct_k = correct[:k].reshape(-1).float().sum(0, keepdim=True)
             res.append(correct_k.mul_(100.0 / batch_size))
         return res
+
 
 def cal_weight_norm(model, norm='max'):
     def process_layer(layer, norm):
@@ -317,9 +323,11 @@ def cal_weight_norm(model, norm='max'):
     cum_prod = process_layer(model, norm)
     return cum_prod
 
+
 def log_var_mean(model, log_folder, epoch, batch):
     variance = []
     mean = []
+
     def process_layer(layer):
         if isinstance(layer, ModifiedConv2d) or isinstance(layer, ModifiedLinear) or isinstance(layer, ModifiedAdaptiveAvgPool2d) or isinstance(layer, ModifiedMaxPool2d):
             variance.append(layer.running_var.detach().cpu())
@@ -331,6 +339,7 @@ def log_var_mean(model, log_folder, epoch, batch):
     process_layer(model)
     torch.save(variance, f"{log_folder}/variance/variance_{epoch}_{batch}.pth")
     torch.save(mean, f"{log_folder}/mean/mean_{epoch}_{batch}.pth")
+
 
 def clamp_batch_norm(model, clamp_value):
     def process_layer(layer, clamp_value_):
